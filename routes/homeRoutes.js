@@ -1,9 +1,10 @@
+//configuração do roteador
 const express = require('express')
 const router = express.Router()
 
 //destino de upload das imagens
 const multer = require('multer')
-const upload = multer({dest: '/storage/books'})
+const upload = multer({dest: 'storage/books'})
 
 //modelo da coleção que usamos no mongodb
 const Books = require('../model/books')
@@ -133,7 +134,7 @@ router.delete('/:id', async(req, res) =>{
             res.status(422).json({ message: 'Livro não encontrado.' })
             return
         }
-
+        
         res.status(200).json({ message: 'Livro removido com sucesso.', result: deletedBook })
     } catch (err) {
         res.status(500).json({message: err})

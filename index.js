@@ -1,13 +1,12 @@
 //configuração do ambiente, importando o arquivo .env, módulos express, mongoose e cors
 require('dotenv').config()
+
 const express = require('express')
 const app = express()
-const mongoose = require('mongoose')
-const cors = require('cors')
 
-//configuração de middleware pra leitura de json
-app.use(express.urlencoded({extended: true}))
-app.use(express.json())
+const mongoose = require('mongoose')
+
+const cors = require('cors')
 
 app.use(cors())
 
