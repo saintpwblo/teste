@@ -1,7 +1,6 @@
 //modelo da coleção que usamos no mongodb
 const Books = require('../model/books')
-
-
+const fs = require('fs')
 
 //BUSCAR LIVROS
 exports.getBooks = async (req, res) =>{
@@ -12,6 +11,7 @@ exports.getBooks = async (req, res) =>{
     }
 }
 
+//BUSCAR LIVROS PELO NOME
 exports.getBookByName = async(req, res) =>{
     let name = req.params.name
     try {
@@ -24,10 +24,11 @@ exports.getBookByName = async(req, res) =>{
     }
 }
 
+//BUSCAR UM ÚNICO LIVRO PELO ID
 exports.getBookById = async(req, res) => {
     let id = req.params.id
     try {
-        let result = Books.findById(id)
+        let result = await Books.findById(id)
         if(!result) return res.status(404).json({message:'Livro não encontrado'})
         res.status(200).json(result)
     } catch (err) {
@@ -40,7 +41,7 @@ exports.insertBook = async(req, res) => {
     let {name, author, description, year, page_number} = req.body
     try {
         
-        if(!name || !author || !description || !year || !page_number) return res.status(422).json({message: "Todos os campos são obrigatórios."})
+        if(!name || !author || !description || !year) return res.status(422).json({message: "Todos os campos são obrigatórios."})
 
         if(year.length!=4){
             res.status(422).json({message: "Ano de publicação é inválido."})
@@ -57,6 +58,18 @@ exports.insertBook = async(req, res) => {
 
 //INSERIR OU ATUALIZAR CAPA DO LIVRO
 exports.insertCover = async(req, res) =>{
+    let id = req.params.id
+    let cover = req.file.path
+    try {
+        const insertedCover = await Books.findByIdAndUpdate(id, {cover: cover}, {new: true})
+        res.status(201).json({message: "200", result: insertedCover})
+    } catch (err) {
+        res.status(500).json({message: err})
+    }
+}
+
+//ATUALIZAR LIVRO
+exports.updateBook = async(req, res) =>{
     let id = req.params.id
     let {name, author, description, year, page_number} = req.body
     let book = {name, author, description, year, page_number}
@@ -81,23 +94,19 @@ exports.insertCover = async(req, res) =>{
     }
 }
 
-//ATUALIZAR LIVRO
-exports.updateBook = async(req, res) =>{
-
-}
-
 //DELETAR LIVRO
 exports.deleteBook = async(req, res) =>{
     let id = req.params.id
 
     try {
+        let cover = await Books.findOne({_id: id}, {cover: 1})
+
         let result = await Books.findByIdAndDelete(id)
+
         if(!result) return res.status(404).json({message: 'Livro não encontrado.'})
 
         res.status(200).json({message: 'Livro deletado com sucesso.', result})
     } catch (err) {
         res.status(500).json({message: err})
     }
-    
-
 }

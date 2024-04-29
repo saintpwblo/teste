@@ -28,18 +28,8 @@ router.get('/searchid/:id', controller.getBookById)
 //inserir livro
 router.post('/', controller.insertBook)
 
-//inserir imagem
-router.put('/cover/:id', upload.single('book-cover'), async (req, res) =>{
-    let id = req.params.id
-    let cover = req.file.path
-    try {
-        const insertedCover = await Books.findByIdAndUpdate(id, {cover: cover}, {new: true})
-        res.status(201).json({message: "200", result: insertedCover})
-    } catch (err) {
-        res.status(500).json({message: err})
-    }
-    
-})
+//inserir/atualizar imagem
+router.put('/cover/:id', upload.single('book-cover'), controller.insertCover)
 
 //atualizar livro
 router.put('/:id', controller.updateBook)
