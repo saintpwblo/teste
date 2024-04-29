@@ -1,5 +1,5 @@
 //configuração do ambiente, importando o arquivo .env, módulos express, mongoose e cors
-require('dotenv').config()
+require('dotenv').config({path: './config/.env'})
 
 const express = require('express')
 const app = express()
