@@ -1,13 +1,13 @@
 //configuração do ambiente, importando o arquivo .env, módulos express, mongoose e cors
 require('dotenv').config({path: './config/.env'})
 
+//chamada do express e do mongoose
 const express = require('express')
 const app = express()
-
 const mongoose = require('mongoose')
 
+//
 const cors = require('cors')
-
 app.use(cors())
 
 //importando módulo que vai cuidar das rotas /books
@@ -19,5 +19,5 @@ app.use('/storage', express.static('storage'))
 
 // conexão com o mongodb, se der certo abre o app na porta especificada pelo .env
 mongoose.connect(process.env.MONGODB_STRING)
-.then(() => app.listen(parseInt(process.env.PORT), () => console.log('App rodando!')))
+.then(() => app.listen(parseInt(process.env.PORT)))
 .catch((err) => console.log(err))
