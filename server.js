@@ -17,9 +17,11 @@ app.use(express.json())
 const booksRoutes = require('./routes/homeRoutes')
 app.use('/books', booksRoutes)
 
-
 //indicando qual é o caminho das imagens
 app.use('/storage', express.static(path.join(__dirname + '/storage')))
+
+//redirecionando para a rota principal
+app.get('/', (_, res) => res.redirect('/books'))
 
 // conexão com o mongodb, se der certo abre o app na porta especificada pelo .env
 mongoose.connect(process.env.MONGODB_STRING)
