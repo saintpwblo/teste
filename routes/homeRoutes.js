@@ -2,18 +2,12 @@
 const express = require('express')
 const router = express.Router()
 
-//destino de upload das imagens
-const multer = require('multer')
-const upload = multer({dest: 'storage/books'})
-
-//modelo da coleção que usamos no mongodb
-const Books = require('../model/books')
-
-//middlewares
-router.use(express.urlencoded({extended:true}))
-router.use(express.json())
-
+//controller da rota /books
 const controller = require('../controller/controller')
+
+//arquivo que vai cuidar da rota de imagens, /books/cover
+const coverRoutes = require('./coverRoutes')
+router.use('/cover', coverRoutes)
 
 //ROTAS
 //buscar todos
@@ -28,13 +22,11 @@ router.get('/searchid/:id', controller.getBookById)
 //inserir livro
 router.post('/', controller.insertBook)
 
-//inserir/atualizar imagem
-router.put('/cover/:id', upload.single('book-cover'), controller.insertCover)
-
 //atualizar livro
 router.put('/:id', controller.updateBook)
 
 //deletar livro
 router.delete('/:id', controller.deleteBook)
 
+//exportando rotas
 module.exports = router

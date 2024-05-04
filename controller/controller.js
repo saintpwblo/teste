@@ -1,6 +1,6 @@
 //modelo da coleção que usamos no mongodb
 const Books = require('../model/books')
-const fs = require('fs')
+
 
 //BUSCAR LIVROS
 exports.getBooks = async (req, res) =>{
@@ -41,12 +41,10 @@ exports.insertBook = async(req, res) => {
     let {name, author, description, year, page_number} = req.body
     try {
         
-        if(!name || !author || !description || !year) return res.status(422).json({message: "Todos os campos são obrigatórios."})
+        if(!name || !author || !description || !year) return res.status(422).json({message: "Os campos name, author, description e year são obrigatórios."})
 
-        if(year.length!=4){
-            res.status(422).json({message: "Ano de publicação é inválido."})
-            return
-        }
+        if(year.length!=4) return res.status(422).json({message: "Ano de publicação é inválido."})
+            
         let createdBook = await Books.create({name, author, description, year, page_number})
 
         res.status(201).json({message: "Livro inserido com sucesso.", result: createdBook})
@@ -56,17 +54,6 @@ exports.insertBook = async(req, res) => {
     }
 }
 
-//INSERIR OU ATUALIZAR CAPA DO LIVRO
-exports.insertCover = async(req, res) =>{
-    let id = req.params.id
-    let cover = req.file.path
-    try {
-        const insertedCover = await Books.findByIdAndUpdate(id, {cover: cover}, {new: true})
-        res.status(201).json({message: "200", result: insertedCover})
-    } catch (err) {
-        res.status(500).json({message: err})
-    }
-}
 
 //ATUALIZAR LIVRO
 exports.updateBook = async(req, res) =>{
@@ -89,7 +76,6 @@ exports.updateBook = async(req, res) =>{
 
         res.status(200).json({message: "Livro atualizado com sucesso.", result: updatedBook})
     } catch (err) {
-        console.error(err);
         res.status(500).json({ message: err })
     }
 }
@@ -98,14 +84,19 @@ exports.updateBook = async(req, res) =>{
 exports.deleteBook = async(req, res) =>{
     let id = req.params.id
 
+    const path = require('path')
+    const fs = require('fs')
+    const {promisify} = require('util')
+    const unlink = promisify(fs.unlink)
+
     try {
-        let cover = await Books.findOne({_id: id}, {cover: 1})
+        let book = await Books.findById(id)
 
-        let result = await Books.findByIdAndDelete(id)
+        if(!book) return res.status(404).json({message: 'Livro não encontrado.'})
+        else if(!book.cover) await Books.findByIdAndDelete(id)
+        else await Promise.all([unlink(path.join(__dirname + '/../' + book.cover)), Books.findByIdAndDelete(id)])
 
-        if(!result) return res.status(404).json({message: 'Livro não encontrado.'})
-
-        res.status(200).json({message: 'Livro deletado com sucesso.', result})
+        res.status(200).json({message: 'Livro deletado com sucesso.'})
     } catch (err) {
         res.status(500).json({message: err})
     }
