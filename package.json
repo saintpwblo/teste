@@ -2,7 +2,7 @@
   "name": "api-prot---books",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
     "build": "echo 'No build step'"
