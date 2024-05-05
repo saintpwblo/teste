@@ -9,8 +9,8 @@ exports.getBookCover = async(req, res) =>{
         let book = await Books.findOne({_id: id}, {cover: 1, _id: 0})
 
         if(!book) return res.status(404).json({message: 'Imagem não encontrada.'}) 
-        console.log(path.join(__dirname, '/../', book.cover))
-        res.status(200).sendFile(path.join(__dirname, '/../', book.cover))
+        
+        res.status(200).sendFile(path.join(process.cwd(), book.cover))
     } catch (err) {
         res.status(500).json({message: err})
     }
@@ -29,7 +29,7 @@ exports.insertCover = async(req, res) =>{
         let book = await Books.findById(id)
         
         if(!book.cover) await Books.findByIdAndUpdate(id, {cover: cover})
-        await Promise.all([unlink(path.join(__dirname, '/../', book.cover)), Books.findByIdAndUpdate(id, {cover: cover})])
+        await Promise.all([unlink(path.join(process.cwd(), book.cover)), Books.findByIdAndUpdate(id, {cover: cover})])
 
         res.status(201).json({message: "200"})
     } catch (err) {
