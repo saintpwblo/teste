@@ -17,10 +17,6 @@ app.use(express.json())
 const booksRoutes = require('./routes/homeRoutes')
 app.use('/books', booksRoutes)
 
-//arquivo que vai cuidar da rota de imagens, /books/cover
-const coverRoutes = require('./routes/coverRoutes')
-app.use('/books/cover', coverRoutes)
-
 //indicando qual é o caminho das imagens
 app.use('/storage', express.static(path.join(__dirname + '/storage')))
 
