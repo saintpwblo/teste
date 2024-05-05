@@ -94,7 +94,7 @@ exports.deleteBook = async(req, res) =>{
 
         if(!book) return res.status(404).json({message: 'Livro não encontrado.'})
         else if(!book.cover) await Books.findByIdAndDelete(id)
-        else await Promise.all([unlink(path.join(__dirname + '/../' + book.cover)), Books.findByIdAndDelete(id)])
+        else await Promise.all([unlink(path.join(__dirname, '/../', book.cover)), Books.findByIdAndDelete(id)])
 
         res.status(200).json({message: 'Livro deletado com sucesso.'})
     } catch (err) {
