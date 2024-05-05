@@ -5,9 +5,6 @@ const router = express.Router()
 //controller da rota /books
 const controller = require('../controller/controller')
 
-//arquivo que vai cuidar da rota de imagens, /books/cover
-const coverRoutes = require('./coverRoutes')
-router.use('/cover', coverRoutes)
 
 //ROTAS
 //buscar todos
