@@ -12,7 +12,7 @@ exports.getBookCover = async(req, res) =>{
         
         res.status(200).sendFile(path.join(process.cwd(), book.cover))
     } catch (err) {
-        res.status(500).json({message: err})
+        res.status(500).json({message: err.message})
     }
 }
 
@@ -33,7 +33,7 @@ exports.insertCover = async(req, res) =>{
 
         res.status(201).json({message: "200"})
     } catch (err) {
-        res.status(500).json({message: err})
+        res.status(500).json({message: err.message})
     }
 }
 

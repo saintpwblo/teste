@@ -7,7 +7,7 @@ exports.getBooks = async (req, res) =>{
     try {
         res.status(200).json(await Books.find())
     } catch (err) {
-        res.status(500).json({message: err})
+        res.status(500).json({message: err.message})
     }
 }
 
@@ -32,7 +32,7 @@ exports.getBookById = async(req, res) => {
         if(!result) return res.status(404).json({message:'Livro não encontrado'})
         res.status(200).json(result)
     } catch (err) {
-        res.status(500).json({message: err})
+        res.status(500).json({message: err.message})
     }
 }
 
@@ -50,7 +50,7 @@ exports.insertBook = async(req, res) => {
         res.status(201).json({message: "Livro inserido com sucesso.", result: createdBook})
         
     } catch (err) {
-        res.status(500).json({message: err})
+        res.status(500).json({message: err.message})
     }
 }
 
@@ -63,20 +63,16 @@ exports.updateBook = async(req, res) =>{
     
     try{
         
-        if(year!=undefined && year.length!=4){
-            res.status(422).json({message: "Ano de publicação é inválido."})
-            return
-        }
+        if(year!=undefined && year.length!=4) return res.status(422).json({message: "Ano de publicação é inválido."})
+            
 
         let updatedBook = await Books.updateOne({_id: id}, book)
-        if (updatedBook.matchedCount===0){
-            res.status(404).json({message: "Livro não encontrado."})
-            return
-        } 
+        if (updatedBook.matchedCount===0)return res.status(404).json({message: "Livro não encontrado."})
+            
 
         res.status(200).json({message: "Livro atualizado com sucesso.", result: updatedBook})
     } catch (err) {
-        res.status(500).json({ message: err })
+        res.status(500).json({ message: err.message })
     }
 }
 
@@ -98,6 +94,6 @@ exports.deleteBook = async(req, res) =>{
 
         res.status(200).json({message: 'Livro deletado com sucesso.'})
     } catch (err) {
-        res.status(500).json({message: err})
+        res.status(500).json({message: err.message})
     }
 }
