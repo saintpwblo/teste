@@ -17,7 +17,7 @@ exports.getBookCover = async(req, res) =>{
 }
 
 //INSERIR OU ATUALIZAR CAPA DO LIVRO
-exports.insertCover = async(req, res) =>{
+exports.insertCover = async(req, res) =>{ 
 
     const fs = require('fs')
     const {promisify} = require('util')
