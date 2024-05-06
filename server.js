@@ -17,8 +17,9 @@ app.use(express.json())
 const booksRoutes = require('./routes/homeRoutes')
 app.use('/books', booksRoutes)
 
+
 //indicando qual é o caminho das imagens
-app.use('/storage', express.static(path.join(__dirname + '/storage')))
+app.use('/storage', express.static(path.join(process.cwd() + '/storage')))
 
 //redirecionando para a rota principal
 app.get('/', (_, res) => res.redirect('/books'))
