@@ -3,8 +3,9 @@ const Books = require('../model/books')
 
 
 //BUSCAR LIVROS
-exports.getBooks = async (req, res) =>{
+exports.getBooks = async (_, res) =>{
     try {
+        //resposta em json: todos os livros da coleção
         res.status(200).json(await Books.find())
     } catch (err) {
         res.status(500).json({message: err.message})
@@ -13,10 +14,13 @@ exports.getBooks = async (req, res) =>{
 
 //BUSCAR LIVROS PELO NOME
 exports.getBookByName = async(req, res) =>{
+    //nome passado como parâmetro na url
     let name = req.params.name
     try {
+        //procura os livros similares ao passado na url
         let result = await Books.find({name: {$regex: new RegExp(name, 'i')}})
 
+        //se não encontrar nenhum, retorna 404
         if (!result) return res.status(404).json({ message: "Livro não encontrado." })
         res.status(200).json(result)
     } catch (err) {
@@ -26,6 +30,7 @@ exports.getBookByName = async(req, res) =>{
 
 //BUSCAR UM ÚNICO LIVRO PELO ID
 exports.getBookById = async(req, res) => {
+    //semelhante ao searchname, com a diferença que vai retornar um único livro e será pelo ID
     let id = req.params.id
     try {
         let result = await Books.findById(id)
@@ -38,15 +43,16 @@ exports.getBookById = async(req, res) => {
 
 //INSERIR LIVRO
 exports.insertBook = async(req, res) => {
-    let {name, author, description, year, page_number} = req.body
+    //desestrutura o corpo da requisição, atribuindo cada valor passado à uma variável
+    const {name, author, description, year, page_number, cover} = req.body
+    
     try {
         
-        if(!name || !author || !description || !year) return res.status(422).json({message: "Os campos name, author, description e year são obrigatórios."})
-
+        //se o ano digitado tiver mais ou menos caracteres que 4, também retorna 422 
         if(year.length!=4) return res.status(422).json({message: "Ano de publicação é inválido."})
-            
-        let createdBook = await Books.create({name, author, description, year, page_number})
-
+        
+        //armazena valores no banco e retorna sucesso
+        let createdBook = await Books.create({name, author, description, year, page_number, cover})
         res.status(201).json({message: "Livro inserido com sucesso.", result: createdBook})
         
     } catch (err) {
@@ -57,20 +63,22 @@ exports.insertBook = async(req, res) => {
 
 //ATUALIZAR LIVRO
 exports.updateBook = async(req, res) =>{
+    //update feito a partir do id do livro passado na url
     let id = req.params.id
-    let {name, author, description, year, page_number} = req.body
-    let book = {name, author, description, year, page_number}
+    //desestruturação do corpo e atribuição à uma nova variável
+    let {name, author, description, year, page_number, cover} = req.body
+    let book = {name, author, description, year, page_number, cover}
     
     try{
-        
+        //similar à verificação de ano no POST, com diferença que é checado se o ano foi realmente mudado
         if(year!=undefined && year.length!=4) return res.status(422).json({message: "Ano de publicação é inválido."})
-            
-
+        
+        //tenta atualizar o livro, se nenhum livro foi atualizado, retorna 404 (não encontrado)
         let updatedBook = await Books.updateOne({_id: id}, book)
-        if (updatedBook.matchedCount===0)return res.status(404).json({message: "Livro não encontrado."})
+        if (updatedBook.matchedCount===0) return res.status(404).json({message: "Livro não encontrado."})
             
-
-        res.status(200).json({message: "Livro atualizado com sucesso.", result: updatedBook})
+        //livro foi encontrado e atualizado
+        res.status(200).json({message: "Livro atualizado com sucesso.", result: await Books.findById(id)})
     } catch (err) {
         res.status(500).json({ message: err.message })
     }
@@ -78,21 +86,20 @@ exports.updateBook = async(req, res) =>{
 
 //DELETAR LIVRO
 exports.deleteBook = async(req, res) =>{
+    //delete feito a partir do id do livro passado na url
     let id = req.params.id
 
-    const path = require('path')
-    const fs = require('fs')
-    const {promisify} = require('util')
-    const unlink = promisify(fs.unlink)
-
+    
     try {
+        //usa o id para procurar o livro
         let book = await Books.findById(id)
 
+        //se não encontrar, retorna 404
         if(!book) return res.status(404).json({message: 'Livro não encontrado.'})
-        else if(!book.cover) await Books.findByIdAndDelete(id)
-        else await Promise.all([unlink(path.join(process.cwd(), book.cover)), Books.findByIdAndDelete(id)])
-
-        res.status(200).json({message: 'Livro deletado com sucesso.'})
+        await Books.findByIdAndDelete(id)
+        
+        //livro foi encontrado e deletado
+        res.status(200).json({message: 'Livro deletado com sucesso.', result: book})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
