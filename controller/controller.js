@@ -80,7 +80,7 @@ exports.updateBook = async(req, res) =>{
         if (updatedBook.matchedCount===0) return res.status(404).json({message: "Livro não encontrado."})
             
         //livro foi encontrado e atualizado
-        res.status(200).json({message: "Livro atualizado com sucesso.", result: updatedBook})
+        res.status(200).json({message: "Livro atualizado com sucesso.", result: await Books.findById(id)})
     } catch (err) {
         res.status(500).json({ message: err.message })
     }
@@ -110,7 +110,7 @@ exports.deleteBook = async(req, res) =>{
         else await Promise.all([unlink(path.join(process.cwd(), book.cover)), Books.findByIdAndDelete(id)])
         
         //livro foi encontrado e deletado
-        res.status(200).json({message: 'Livro deletado com sucesso.'})
+        res.status(200).json({message: 'Livro deletado com sucesso.', result: book})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
